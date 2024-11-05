@@ -1,0 +1,176 @@
+﻿<Window x:Class="wpf_ironpython.MainWindow"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+       xmlns:local="clr-namespace:wpf_ironpython"
+       mc:Ignorable="d"
+       Title="Chatbot, News Scraper and Email Sender" Height="750" Width="800"
+       Background="#F0F0F0">
+    <Window.Resources>
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Margin" Value="0,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                               CornerRadius="5"
+                               BorderThickness="1"
+                               BorderBrush="#388E3C">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#45a049"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="PlaceholderTextBox" TargetType="{x:Type TextBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Grid>
+                            <TextBox Text="{Binding Path=Text, RelativeSource={RelativeSource TemplatedParent}, 
+                                    Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                    x:Name="textSource" 
+                                    Background="Transparent" 
+                                    Panel.ZIndex="2" 
+                                    Padding="{TemplateBinding Padding}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"/>
+                            <TextBox Text="{TemplateBinding Tag}" Background="{TemplateBinding Background}" Panel.ZIndex="1">
+                                <TextBox.Style>
+                                    <Style TargetType="{x:Type TextBox}">
+                                        <Setter Property="Foreground" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=Text, Source={x:Reference textSource}}" Value="">
+                                                <Setter Property="Foreground" Value="Gray"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBox.Style>
+                            </TextBox>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Padding="20" Background="White" CornerRadius="10" Margin="10">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="5" Color="#A0A0A0" Opacity="0.3"/>
+            </Border.Effect>
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Chatbot" FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                <TextBox x:Name="ChatOutputTextBox" 
+                       Grid.Row="1" 
+                       Margin="0,10" 
+                       IsReadOnly="True" 
+                       TextWrapping="Wrap"
+                       AcceptsReturn="True"
+                       Background="#F5F5F5"
+                       BorderThickness="1"
+                       BorderBrush="#BDBDBD"
+                       Padding="10"
+                       FontFamily="Malgun Gothic"
+                       FontSize="12"
+                       VerticalScrollBarVisibility="Auto"/>
+
+                <TextBox x:Name="ChatInputTextBox" 
+                       Grid.Row="2" 
+                       Margin="0,10" 
+                       Padding="10,5"
+                       BorderThickness="1" 
+                       BorderBrush="#BDBDBD"
+                       Style="{StaticResource PlaceholderTextBox}"
+                       Tag="Type your message here..."/>
+
+                <Button Content="Send" 
+                       Grid.Row="3" 
+                       Click="SendChatButton_Click" 
+                       Style="{StaticResource ModernButton}"/>
+
+                <TextBox x:Name="NewsKeywordTextBox" 
+                       Grid.Row="4" 
+                       Margin="0,10" 
+                       Padding="10,5"
+                       BorderThickness="1" 
+                       BorderBrush="#BDBDBD"
+                       Style="{StaticResource PlaceholderTextBox}"
+                       Tag="Enter news keyword..."/>
+
+                <Button Content="Scrape News" 
+                       Grid.Row="5" 
+                       Click="ScrapeNewsButton_Click" 
+                       Style="{StaticResource ModernButton}"/>
+
+                <GroupBox Header="Email Settings" 
+                        Grid.Row="6" 
+                        Margin="0,20,0,10" 
+                        BorderBrush="#BDBDBD" 
+                        BorderThickness="1">
+                    <StackPanel Margin="10">
+                        <TextBlock Text="Sender Email:" Margin="0,0,0,5"/>
+                        <TextBox x:Name="SenderEmailTextBox" 
+                               Margin="0,0,0,10" 
+                               Padding="10,5"
+                               BorderThickness="1" 
+                               BorderBrush="#BDBDBD"
+                               Style="{StaticResource PlaceholderTextBox}"
+                               Tag="Enter your email address"/>
+
+                        <TextBlock Text="Sender Password:" Margin="0,0,0,5"/>
+                        <PasswordBox x:Name="SenderPasswordBox" 
+                                  Margin="0,0,0,10" 
+                                  Padding="10,5"
+                                  BorderThickness="1" 
+                                  BorderBrush="#BDBDBD"/>
+
+                        <TextBlock Text="Recipient Email:" Margin="0,0,0,5"/>
+                        <TextBox x:Name="RecipientEmailTextBox" 
+                               Margin="0,0,0,10" 
+                               Padding="10,5"
+                               BorderThickness="1" 
+                               BorderBrush="#BDBDBD"
+                               Style="{StaticResource PlaceholderTextBox}"
+                               Tag="Enter recipient's email address"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <Button Content="Send Email with News" 
+                       Grid.Row="7" 
+                       Click="SendEmailButton_Click" 
+                       Style="{StaticResource ModernButton}"/>
+
+                <Button Content="Generate Report" 
+                       Grid.Row="8" 
+                       Click="GenerateReportButton_Click" 
+                       Style="{StaticResource ModernButton}"/>
+            </Grid>
+        </Border>
+    </ScrollViewer>
+</Window>
